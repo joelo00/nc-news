@@ -67,3 +67,29 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.display-article {
+  border: white solid 1px;
+  margin: 0.5rem;
+  padding: 0.3rem;
+  background-color: #111;
+  border-radius: 20px;
+  width: 500px;
+  height: 500px;
+
+}
+
+.display-articles-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  list-style-type: none;
+  justify-content: center;
+}
+
+.display-article-image {
+  width: 60%;
+  height: 60%;
+
+  border-radius: 20px;
+}
