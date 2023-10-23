@@ -93,3 +93,32 @@ button:focus-visible {
 
   border-radius: 20px;
 }
+
+.display-single-article{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0.2rem;
+  padding: 0.1rem;
+  
+}
+
+.article-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content:space-around;
+  width: 100%;
+}
+
+
+.article-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: left;
+  text-align: left
+  ;
+  width: 80vw;
+}

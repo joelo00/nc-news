@@ -10,7 +10,7 @@ function Header() {
         <Link to = "/users"> Users</Link>
       </nav>
       </>
-    );
+    )
   }
 
 export default Header
