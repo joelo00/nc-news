@@ -14,6 +14,10 @@ export function getArticleById(article_id) {
 }
 
 export function getCommentsByArticleId(article_id) {
-    console.log(article_id);
     return newsAPI.get(`/articles/${article_id}/comments`)
+}
+
+export function patchArticle(article_id, inc_votes) {
+
+    return newsAPI.patch(`/articles/${article_id}`, {inc_votes})
 }

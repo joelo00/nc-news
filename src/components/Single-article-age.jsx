@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from 'react'
-import { getArticleById, getCommentsByArticleId } from '../axios'
+import { getArticleById, getCommentsByArticleId, patchArticle } from '../axios'
 function SingleArticlePage() {
     const { article_id } = useParams();
     const [article, setArticle] = useState({});
     const [loading, setLoading] = useState(true);
     const [comments, setComments] = useState([{}]);
-  
+    const [incrementVotes, setIncrementVotes] = useState(0)
+    const [error, setError] = useState(false)
     useEffect(() => {
       const fetchArticle = async () => {
         const { data: { article } } = await getArticleById(article_id);
@@ -16,7 +17,21 @@ function SingleArticlePage() {
   
       fetchArticle();
     }, [article_id]);
-  
+    
+    const incrementVote = async (inc_votes) => {
+        try {
+          const result = await patchArticle(article_id, inc_votes);
+
+          setArticle(result.data.article);
+          setError(false);
+          setIncrementVotes(() => {
+            return (incrementVotes + inc_votes);
+          });
+        } catch (error) {
+          setError(true);
+        }
+      };
+
     return (
       loading ? <h2>Loading...</h2> :
       <>
@@ -26,7 +41,13 @@ function SingleArticlePage() {
           <img className='display-single-article-image' src={article.article_img_url} alt={article.title} />
           <p className='article-body'>{article.body}</p>
           <div className='article-info'>
+            <div>
                         <p>Votes: {article.votes}  </p>
+                        {error && <p>Sorry, vote failed!</p>}
+                        <button disabled={![0, -1].includes(incrementVotes)} onClick={() => incrementVote(1)}>👍</button>
+                        <button disabled={![1, 0].includes(incrementVotes)} onClick={() => incrementVote(-1)}>👎</button>
+
+            </div>
                         <p>Topic: {article.topic} </p>
                         <p>Date: {article.created_at.slice(0,10)}</p>
                     </div>
@@ -38,18 +59,18 @@ function SingleArticlePage() {
 
 
 function CommentsSection({setComments, article_id, comments}) {
-    const [commentsLoaded, setCommentsLoaded] = useState(false)
+    const [commentsVisible, setCommentsVisible] = useState(false)
     const displayAllComments = async () => {
         const {data : {comments}} = await getCommentsByArticleId(article_id)
-        setCommentsLoaded(true)
+        setCommentsVisible(true)
         setComments(comments)
     }
     return (
-        !commentsLoaded ?
+        !commentsVisible ?
           <button onClick={displayAllComments}>View Comments</button>
           :
           <>
-          <button onClick={() => setCommentsLoaded(false)}>Hide Comments </button> 
+          <button onClick={() => setCommentsVisible(false)}>Hide Comments </button> 
           <div className="comments-container">
           {comments.map((comment) => {
               return (
@@ -57,7 +78,9 @@ function CommentsSection({setComments, article_id, comments}) {
                   <p>{comment.body}</p>
                  <div className="comment-info">
                     <p>{comment.author}</p>
-                    <p>Votes: {comment.votes}</p>
+                    <div>
+                    <p> Votes: {comment.votes}</p>
+                    </div>
                     <p>Date: {comment.created_at.slice(0,10)}</p>
                  </div>
                   </div>
