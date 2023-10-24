@@ -66,8 +66,11 @@ function CommentsSection({setComments, article_id, comments}) {
     const [commentsVisible, setCommentsVisible] = useState(false)
     const [commentFormVisible, setCommentFormVisible] = useState(false)
     const [errorPostingComment, setErrorPostingComment] = useState(false)
+    const [loadingComments, setLoadingComments] = useState(false)
     const displayAllComments = async () => {
+        setLoadingComments(true)
         const {data : {comments}} = await getCommentsByArticleId(article_id)
+        setLoadingComments(false)
         setCommentsVisible(true)
         setComments(comments)
         setErrorPostingComment(false)
@@ -83,13 +86,13 @@ function CommentsSection({setComments, article_id, comments}) {
             <>
               <button onClick={displayAllComments}>View Comments</button>
               {!commentFormVisible && <button onClick={addComment}>➕ </button>}
-              {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} />}
+              {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} setCommentsVisible={setCommentsVisible} setLoadingComments={setLoadingComments} />}
             </>
-          ) : (
+          ) : (!loadingComments ?
             <>
               <button onClick={() => setCommentsVisible(false)}>Hide Comments </button> 
             {!commentFormVisible && <button onClick={addComment}>➕ </button>}
-            {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} />}
+            {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} setCommentsVisible={setCommentsVisible} setLoadingComments={setLoadingComments} />}
               <div className="comments-container">
                 {comments.map((comment) => {
                   return (
@@ -107,22 +110,27 @@ function CommentsSection({setComments, article_id, comments}) {
                 })}
               </div>
             </>
+            : <h2>Loading Comments ...</h2>
           )}
         </>
       );
     }
 
-function CommentForm({article_id, setComments, comments, setCommentFormVisible, errorPostingComment, setErrorPostingComment}) {
+function CommentForm({article_id, setComments, comments, setCommentFormVisible, errorPostingComment, setErrorPostingComment, setCommentsVisible, loadingComments, setLoadingComments}) {
     const [userInput, setUserInput] = useState('')
+    
     const handleSubmitComment = async (e) => {
         try {
           e.preventDefault();
+          setLoadingComments(true)
           const {data:{comment}} = await postCommentOnArticle(article_id, userInput);
-          setComments([...comments, comment]);
+          const {data : {comments}} = await getCommentsByArticleId(article_id)
+          setLoadingComments(false)
+          setComments(comments);
           setCommentFormVisible(false);
           setErrorPostingComment(false)
+          setCommentsVisible(true)
         } catch (error) {
-          console.error(error);
           setErrorPostingComment(true)
         }
       };
