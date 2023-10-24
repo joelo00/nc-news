@@ -55,6 +55,22 @@ function SearchForm({setArticles, setLoading}) {
             </option>
           </select>
         </label>
+        <label htmlFor="select">
+          <select value={topic}   onChange={(e) => {setTopic(e.target.value)}} id="select">
+            <option  value="">
+              Select Topic
+            </option>
+            <option  value="Cooking">
+              Cooking
+            </option>
+            <option  value="Coding">
+              Coding
+            </option>
+            <option  value="Football">
+              Football
+            </option>
+          </select>
+        </label>
 
         </div>
         </>
