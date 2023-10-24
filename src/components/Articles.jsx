@@ -25,7 +25,11 @@ function SearchForm({setArticles, setLoading}) {
             <input type="text" placeholder="search for articles" id="search" />
             <button>Search</button>
         </form>
-        <button onClick={displayAllArticles}>View All Articles </button>
+        <div>
+            <button onClick={displayAllArticles}>View All Articles </button>
+            <Link to='/articles/cooking'></Link>
+
+        </div>
         </>
     )
 }

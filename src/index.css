@@ -125,8 +125,7 @@ button:focus-visible {
 
 .comments-container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
   list-style-type: none;
   justify-content: center;
 }
@@ -152,4 +151,18 @@ button:focus-visible {
   justify-content:space-around;
   width: 100%;
   font-style: oblique;
+}
+
+.comment-form-container {
+  display: flex;
+  justify-content: center;
+
+
+}
+
+.comment-form-input{
+  background-color: white;
+  height: 4rem;
+  font-size: x-large;
+  color: black;
 }
