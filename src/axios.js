@@ -8,6 +8,10 @@ export function getAllArticles() {
     return newsAPI.get('/articles?limit=1000')
 }
 
+export function getArticlesByTopic (topic) {
+    return newsAPI.get(`/articles?topic=${topic}`)
+}
+
 export function getArticleById(article_id) {
     return newsAPI.get(`/articles/${article_id}`)
 }
