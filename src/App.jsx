@@ -10,7 +10,7 @@ function App() {
   <Routes>
     <Route path='/articles' element={<Articles />} />
     <Route path='/articles/:article_id' element={<SingleArticlePage />} />
-
+    <Route path='/articles/:article_id'></Route>
   </Routes>
   
   </>
