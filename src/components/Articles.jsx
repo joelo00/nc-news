@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { getAllArticles } from '../axios'
+import { useEffect, useState } from 'react'
+import { getAllArticles, getArticlesByTopic } from '../axios'
 import { Link } from 'react-router-dom'
 function Articles() {
     const [articles, setArticles] = useState([{"article_id":34,"title":"The Notorious MSG’s Unlikely Formula For Success","topic":"cooking","author":"grumpy19","created_at":"2020-11-22T11:13:00.000Z","votes":0,"article_img_url":"https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700","comment_count":11}, {"article_id":12,"title":"The battle for Node.js security has only begun","topic":"coding","author":"tickle122","created_at":"2020-11-15T13:25:00.000Z","votes":0,"article_img_url":"https://images.pexels.com/photos/10845119/pexels-photo-10845119.jpeg?w=700&h=700","comment_count":7}])
@@ -11,13 +11,25 @@ function Articles() {
 }
 
 function SearchForm({setArticles, setLoading}) {
-
+    const [topic, setTopic] = useState('')
     const displayAllArticles = async () => {
         setLoading(true)
         const {data : {articles}} = await getAllArticles()
         setLoading(false)
         setArticles(articles)
     }
+
+    useEffect(() => {
+        console.log(topic);
+        const fetchData = async () => {
+          const {data: {articles}} = await getArticlesByTopic(topic.toLowerCase());
+          setArticles(articles);
+        };
+        fetchData();
+      }, [topic]);
+
+
+
     return (
         <>
         <form>
@@ -27,7 +39,22 @@ function SearchForm({setArticles, setLoading}) {
         </form>
         <div>
             <button onClick={displayAllArticles}>View All Articles </button>
-            <Link to='/articles/cooking'></Link>
+            <label htmlFor="select">
+          <select value={topic}   onChange={(e) => {setTopic(e.target.value)}} id="select">
+            <option  value="">
+              Select Topic
+            </option>
+            <option  value="Cooking">
+              Cooking
+            </option>
+            <option  value="Coding">
+              Coding
+            </option>
+            <option  value="Football">
+              Football
+            </option>
+          </select>
+        </label>
 
         </div>
         </>
