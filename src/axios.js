@@ -6,7 +6,6 @@ const newsAPI = axios.create({
 
 export function getAllArticles() {
     return newsAPI.get('/articles?limit=1000')
-
 }
 
 export function getArticleById(article_id) {
@@ -18,6 +17,9 @@ export function getCommentsByArticleId(article_id) {
 }
 
 export function patchArticle(article_id, inc_votes) {
-
     return newsAPI.patch(`/articles/${article_id}`, {inc_votes})
+}
+
+export function postCommentOnArticle(article_id, body, username='jessjelly') {
+    return newsAPI.post(`/articles/${article_id}/comments`, {body, username})
 }

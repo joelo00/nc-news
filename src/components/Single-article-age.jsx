@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from 'react'
-import { getArticleById, getCommentsByArticleId, patchArticle } from '../axios'
+import { getArticleById, getCommentsByArticleId, patchArticle, postCommentOnArticle } from '../axios'
+
 function SingleArticlePage() {
     const { article_id } = useParams();
     const [article, setArticle] = useState({});
@@ -20,15 +21,18 @@ function SingleArticlePage() {
     
     const incrementVote = async (inc_votes) => {
         try {
+            setIncrementVotes(() => {
+              return (incrementVotes + inc_votes);
+            });
           const result = await patchArticle(article_id, inc_votes);
 
           setArticle(result.data.article);
           setError(false);
-          setIncrementVotes(() => {
-            return (incrementVotes + inc_votes);
-          });
         } catch (error) {
           setError(true);
+          setIncrementVotes(() => {
+            return (incrementVotes - inc_votes);
+          });
         }
       };
 
@@ -60,35 +64,82 @@ function SingleArticlePage() {
 
 function CommentsSection({setComments, article_id, comments}) {
     const [commentsVisible, setCommentsVisible] = useState(false)
+    const [commentFormVisible, setCommentFormVisible] = useState(false)
+    const [errorPostingComment, setErrorPostingComment] = useState(false)
     const displayAllComments = async () => {
         const {data : {comments}} = await getCommentsByArticleId(article_id)
         setCommentsVisible(true)
         setComments(comments)
+        setErrorPostingComment(false)
+    }
+
+    const addComment = () => {
+        setCommentFormVisible(true)
+        setErrorPostingComment(false)
     }
     return (
-        !commentsVisible ?
-          <button onClick={displayAllComments}>View Comments</button>
-          :
-          <>
-          <button onClick={() => setCommentsVisible(false)}>Hide Comments </button> 
-          <div className="comments-container">
-          {comments.map((comment) => {
-              return (
-                  <div className='comment' key={comment.comment_id}>
-                  <p>{comment.body}</p>
-                 <div className="comment-info">
-                    <p>{comment.author}</p>
-                    <div>
-                    <p> Votes: {comment.votes}</p>
+        <>
+          {!commentsVisible ? (
+            <>
+              <button onClick={displayAllComments}>View Comments</button>
+              {!commentFormVisible && <button onClick={addComment}>➕ </button>}
+              {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} />}
+            </>
+          ) : (
+            <>
+              <button onClick={() => setCommentsVisible(false)}>Hide Comments </button> 
+            {!commentFormVisible && <button onClick={addComment}>➕ </button>}
+            {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} />}
+              <div className="comments-container">
+                {comments.map((comment) => {
+                  return (
+                    <div className='comment' key={comment.comment_id}>
+                      <p>{comment.body}</p>
+                      <div className="comment-info">
+                        <p>{comment.author}</p>
+                        <div>
+                          <p> Votes: {comment.votes}</p>
+                        </div>
+                        <p>Date: {comment.created_at.slice(0,10)}</p>
+                      </div>
                     </div>
-                    <p>Date: {comment.created_at.slice(0,10)}</p>
-                 </div>
-                  </div>
                   );
                 })}
-                
-          </div>
-          </>
+              </div>
+            </>
+          )}
+        </>
       );
+    }
+
+function CommentForm({article_id, setComments, comments, setCommentFormVisible, errorPostingComment, setErrorPostingComment}) {
+    const [userInput, setUserInput] = useState('')
+    const handleSubmitComment = async (e) => {
+        try {
+          e.preventDefault();
+          const {data:{comment}} = await postCommentOnArticle(article_id, userInput);
+          setComments([...comments, comment]);
+          setCommentFormVisible(false);
+          setErrorPostingComment(false)
+        } catch (error) {
+          console.error(error);
+          setErrorPostingComment(true)
         }
+      };
+
+    return (
+        !errorPostingComment ? 
+        <form className="comment-form-container" onSubmit={handleSubmitComment}>
+            <label value={userInput} htmlFor="comment"></label>
+            <input className='comment-form-input' type="text" value={userInput} onChange={(e) => {
+                const{target : {value}} = e
+                setUserInput(value)
+        
+
+            }} placeholder="add comment" id="comment" />
+            <button type='submit'>Submit</button>
+            <button onClick={() => setCommentFormVisible(false)}>❌ </button>
+        </form> : <p>Apologies, your comment could not be posted</p>
+    )
+}
 export default SingleArticlePage
