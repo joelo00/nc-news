@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAllArticles, getArticlesByTopic } from '../axios'
+import { getAllArticles, getArticlesByTopic, sortArticles } from '../axios'
 import { Link } from 'react-router-dom'
 function Articles() {
     const [articles, setArticles] = useState([{"article_id":34,"title":"The Notorious MSG’s Unlikely Formula For Success","topic":"cooking","author":"grumpy19","created_at":"2020-11-22T11:13:00.000Z","votes":0,"article_img_url":"https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700","comment_count":11}, {"article_id":12,"title":"The battle for Node.js security has only begun","topic":"coding","author":"tickle122","created_at":"2020-11-15T13:25:00.000Z","votes":0,"article_img_url":"https://images.pexels.com/photos/10845119/pexels-photo-10845119.jpeg?w=700&h=700","comment_count":7}])
@@ -12,6 +12,8 @@ function Articles() {
 
 function SearchForm({setArticles, setLoading}) {
     const [topic, setTopic] = useState('')
+    const [sortBy, setSortBy] = useState('')
+    const [order, setOrder] = useState('desc')
     const displayAllArticles = async () => {
         setLoading(true)
         const {data : {articles}} = await getAllArticles()
@@ -20,15 +22,26 @@ function SearchForm({setArticles, setLoading}) {
     }
 
     useEffect(() => {
-        console.log(topic);
+        setLoading(true)
         const fetchData = async () => {
-          const {data: {articles}} = await getArticlesByTopic(topic.toLowerCase());
+          const {data: {articles}} = await getArticlesByTopic(topic.toLowerCase()); 
           setArticles(articles);
+          setLoading(false)
         };
         fetchData();
       }, [topic]);
 
 
+      useEffect(() => {
+        setLoading(true)
+        const sortData = async () => {
+          const {data: {articles}} = sortBy ? await sortArticles(sortBy.toLowerCase(), order, topic.toLowerCase()) : await getAllArticles()
+          setArticles(articles)
+          setLoading(false)
+       
+        };
+       sortData();
+      }, [sortBy, order]);
 
     return (
         <>
@@ -56,21 +69,23 @@ function SearchForm({setArticles, setLoading}) {
           </select>
         </label>
         <label htmlFor="select">
-          <select value={topic}   onChange={(e) => {setTopic(e.target.value)}} id="select">
+          <select value={sortBy}   onChange={(e) => {setSortBy(e.target.value)}} id="select">
             <option  value="">
-              Select Topic
+              sort by
             </option>
-            <option  value="Cooking">
-              Cooking
+            <option  value="Author">
+              Author
             </option>
-            <option  value="Coding">
-              Coding
+            <option  value="Votes">
+              Votes
             </option>
-            <option  value="Football">
-              Football
-            </option>
+         {/*    <option  value="Comment count">
+              Comment count
+            </option> */}
           </select>
         </label>
+        {sortBy && <button onClick={() =>setOrder('asc')}>⇑</button>}
+        {sortBy && <button onClick={() => setOrder('desc')}>⇓</button>} 
 
         </div>
         </>

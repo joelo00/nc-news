@@ -27,3 +27,7 @@ export function patchArticle(article_id, inc_votes) {
 export function postCommentOnArticle(article_id, body, username='jessjelly') {
     return newsAPI.post(`/articles/${article_id}/comments`, {body, username})
 }
+
+export function sortArticles(sort_by, order, topic) {
+    return !topic ? newsAPI.get(`/articles?sort_by=${sort_by}&order=${order}`) : newsAPI.get(`/articles?sort_by=${sort_by}&order=${order}&topic=${topic}`)
+}
