@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from 'react'
-import { getArticleById, getCommentsByArticleId, patchArticle, postCommentOnArticle } from '../axios'
+import { getArticleById, getCommentsByArticleId, patchArticle, postCommentOnArticle, deleteComment } from '../axios'
 
 function SingleArticlePage() {
     const { article_id } = useParams();
@@ -63,6 +63,7 @@ function SingleArticlePage() {
 
 
 function CommentsSection({setComments, article_id, comments}) {
+    const [username, setUsername] = useState('jessjelly')
     const [commentsVisible, setCommentsVisible] = useState(false)
     const [commentFormVisible, setCommentFormVisible] = useState(false)
     const [errorPostingComment, setErrorPostingComment] = useState(false)
@@ -79,6 +80,16 @@ function CommentsSection({setComments, article_id, comments}) {
     const addComment = () => {
         setCommentFormVisible(true)
         setErrorPostingComment(false)
+    }
+
+    const removeComment = async(comment_id) => {
+        const res = await deleteComment(comment_id)
+        const {data : {comments}} = await getCommentsByArticleId(article_id)
+        setLoadingComments(false)
+        setCommentsVisible(true)
+        setComments(comments)
+        setErrorPostingComment(false)
+
     }
     return (
         <>
@@ -105,6 +116,10 @@ function CommentsSection({setComments, article_id, comments}) {
                         </div>
                         <p>Date: {comment.created_at.slice(0,10)}</p>
                       </div>
+                      {username===comment.author && <button onClick={(e) => {
+                        e.currentTarget.disabled=true
+                        let {comment_id} = comment
+                        removeComment(comment_id)}}>❌</button>} 
                     </div>
                   );
                 })}
@@ -139,7 +154,7 @@ function CommentForm({article_id, setComments, comments, setCommentFormVisible, 
         !errorPostingComment ? 
         <form className="comment-form-container" onSubmit={handleSubmitComment}>
             <label value={userInput} htmlFor="comment"></label>
-            <input className='comment-form-input' type="text" value={userInput} onChange={(e) => {
+            <input className='comment-form-input' required type="text" value={userInput} onChange={(e) => {
                 const{target : {value}} = e
                 setUserInput(value)
         
