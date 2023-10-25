@@ -31,3 +31,9 @@ export function postCommentOnArticle(article_id, body, username='jessjelly') {
 export function sortArticles(sort_by, order, topic) {
     return !topic ? newsAPI.get(`/articles?sort_by=${sort_by}&order=${order}`) : newsAPI.get(`/articles?sort_by=${sort_by}&order=${order}&topic=${topic}`)
 }
+
+
+export function deleteComment(comment_id) {
+    return newsAPI.delete(`/comments/${comment_id}`)
+
+}
