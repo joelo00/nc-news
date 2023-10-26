@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAllArticles, getArticlesByTopic, sortArticles } from '../../axios'
+import { getAllArticles, getArticlesByTopic, sortArticles, getArticlesByQuery } from '../../axios'
 
 
 
@@ -14,27 +14,17 @@ export function SearchForm({setArticles, setLoading}) {
         setArticles(articles)
     }
 
-    useEffect(() => {
+      useEffect(() => {
         setLoading(true)
         const fetchData = async () => {
-          const {data: {articles}} = await getArticlesByTopic(topic.toLowerCase()); 
+          console.log(sortBy, order);
+          const {data: {articles}} = await getArticlesByQuery(topic.toLowerCase(), sortBy.toLowerCase(), order.toLowerCase()); 
           setArticles(articles);
           setLoading(false)
         };
         fetchData();
-      }, [topic]);
-
-
-      useEffect(() => {
-        setLoading(true)
-        const sortData = async () => {
-          const {data: {articles}} = sortBy ? await sortArticles(sortBy.toLowerCase(), order, topic.toLowerCase()) : await getAllArticles()
-          setArticles(articles)
-          setLoading(false)
-       
-        };
-       sortData();
-      }, [sortBy, order]);
+      
+      },[topic, sortBy, order])
 
     return (
         <>

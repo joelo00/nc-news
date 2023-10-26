@@ -12,6 +12,18 @@ export function getArticlesByTopic (topic) {
     return newsAPI.get(`/articles?topic=${topic}`)
 }
 
+export function getArticlesByQuery (topic, sort_by, order='desc') {
+    let articleQueries = ''
+    if (topic) articleQueries += `&topic=${topic}`
+    if (sort_by) articleQueries += `&sort_by=${sort_by}`
+    if (order) articleQueries += `&order=${order}`
+    if (articleQueries) {
+        articleQueries = '?' + articleQueries.substring(1); // Remove the leading '&'
+      }
+    return newsAPI.get(`articles${articleQueries}`)
+    
+}
+
 export function getArticleById(article_id) {
     return newsAPI.get(`/articles/${article_id}`)
 }
