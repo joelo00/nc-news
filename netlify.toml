@@ -1,4 +1,3 @@
 [build]
   base = "/home/joelo2148/northcoders/frontend/review-week/nc-news/"
-[build]
   command = "npm run build" 
