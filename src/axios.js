@@ -49,3 +49,7 @@ export function deleteComment(comment_id) {
     return newsAPI.delete(`/comments/${comment_id}`)
 
 }
+
+export function getUsers () {
+    return newsAPI.get('/users')
+}

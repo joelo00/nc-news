@@ -166,3 +166,22 @@ button:focus-visible {
   font-size: x-large;
   color: black;
 }
+
+.users-container{
+  display: flex;
+  flex-direction: column;
+
+}
+
+.user {
+ border: 1px solid white;
+  border-radius: 100pc;
+}
+
+.signed-in-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(0%, -50%);
+  transform-origin: top right;
+}

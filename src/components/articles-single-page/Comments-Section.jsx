@@ -1,14 +1,15 @@
 import { useParams } from "react-router-dom"
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { getArticleById, getCommentsByArticleId, patchArticle, postCommentOnArticle, deleteComment } from '../../axios'
 import { CommentForm } from "./Comment-form"
-
+import { UserContext } from '../users/UserContext';
 export function CommentsSection({setComments, article_id, comments}) {
-    const [username, setUsername] = useState('jessjelly')
+    const { user } = useContext(UserContext);
     const [commentsVisible, setCommentsVisible] = useState(false)
     const [commentFormVisible, setCommentFormVisible] = useState(false)
     const [errorPostingComment, setErrorPostingComment] = useState(false)
     const [loadingComments, setLoadingComments] = useState(false)
+    const [errorDeletingComment, setErrorDeletingComment] = useState(false)
     const displayAllComments = async () => {
         setLoadingComments(true)
         const {data : {comments}} = await getCommentsByArticleId(article_id)
@@ -24,12 +25,19 @@ export function CommentsSection({setComments, article_id, comments}) {
     }
 
     const removeComment = async(comment_id) => {
-        const res = await deleteComment(comment_id)
-        const {data : {comments}} = await getCommentsByArticleId(article_id)
-        setLoadingComments(false)
-        setCommentsVisible(true)
-        setComments(comments)
-        setErrorPostingComment(false)
+        let displayComments = comments.filter((comment) => comment.comment_id !== comment_id)
+        setComments(displayComments)
+        setErrorDeletingComment(false);
+        try {
+          const res = await deleteComment(comment_id);
+          setLoadingComments(false);
+          setCommentsVisible(true);
+          setErrorPostingComment(false);
+        } catch (error) {
+          setErrorDeletingComment(true);
+          setCommentsVisible(false);
+          setComments(comments);
+        }
 
     }
     return (
@@ -45,6 +53,7 @@ export function CommentsSection({setComments, article_id, comments}) {
               <button onClick={() => setCommentsVisible(false)}>Hide Comments </button> 
             {!commentFormVisible && <button onClick={addComment}>➕ </button>}
             {commentFormVisible && <CommentForm article_id={article_id} setComments={setComments} comments={comments} setCommentFormVisible={setCommentFormVisible} errorPostingComment={errorPostingComment} setErrorPostingComment={setErrorPostingComment} setCommentsVisible={setCommentsVisible} setLoadingComments={setLoadingComments} />}
+            {errorDeletingComment && <p>Apologies, your comment could not be deleted</p>}
               <div className="comments-container">
                 {comments.map((comment) => {
                   return (
@@ -57,7 +66,7 @@ export function CommentsSection({setComments, article_id, comments}) {
                         </div>
                         <p>Date: {comment.created_at.slice(0,10)}</p>
                       </div>
-                      {username===comment.author && <button onClick={(e) => {
+                      {user===comment.author && <button onClick={(e) => {
                         e.currentTarget.disabled=true
                         let {comment_id} = comment
                         removeComment(comment_id)}}>❌</button>} 

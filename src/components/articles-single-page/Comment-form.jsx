@@ -1,17 +1,17 @@
 import { useParams } from "react-router-dom"
-import { useEffect, useState } from 'react'
-import { getArticleById, getCommentsByArticleId, patchArticle, postCommentOnArticle, deleteComment } from '../../axios'
-
+import { useEffect, useState, useContext } from 'react'
+import { getCommentsByArticleId,  postCommentOnArticle} from '../../axios'
+import { UserContext } from '../users/UserContext';
 
 
 export function CommentForm({article_id, setComments, comments, setCommentFormVisible, errorPostingComment, setErrorPostingComment, setCommentsVisible, loadingComments, setLoadingComments}) {
     const [userInput, setUserInput] = useState('')
-    
+    const { user } = useContext(UserContext);
     const handleSubmitComment = async (e) => {
         try {
           e.preventDefault();
           setLoadingComments(true)
-          const {data:{comment}} = await postCommentOnArticle(article_id, userInput);
+          const {data:{comment}} = await postCommentOnArticle(article_id, userInput, user);
           const {data : {comments}} = await getCommentsByArticleId(article_id)
           setLoadingComments(false)
           setComments(comments);

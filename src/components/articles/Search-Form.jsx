@@ -17,7 +17,6 @@ export function SearchForm({setArticles, setLoading}) {
       useEffect(() => {
         setLoading(true)
         const fetchData = async () => {
-          console.log(sortBy, order);
           const {data: {articles}} = await getArticlesByQuery(topic.toLowerCase(), sortBy.toLowerCase(), order.toLowerCase()); 
           setArticles(articles);
           setLoading(false)
